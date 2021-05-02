@@ -7,6 +7,7 @@ const User = require('../models/User');
 
 const router = express.Router();
 
+
 function generateToken(params = {}) {
   return jwt.sign(
     params,
@@ -15,46 +16,29 @@ function generateToken(params = {}) {
   );
 }
 
-router.post('/register', async (req, res) => {
-  const { email } = req.body;
-  
-  try {
-    if(await User.findOne({ email }))
-      return res.status(400).json({ error: 'User already exists' });
 
-    const user = await User.create(req.body);
-
-    user.password = undefined;
-
-    return res.json({ 
-      user,
-      token: generateToken({ id: user.id }),
-    });
-  
-  } catch (err) {
-    return res.status(400).json({ error: 'Registration failed' });
-  }
-});
-
-
-router.post('/authenticate', async (req, res) => {
+/**
+ * Login route
+ */
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
+  // select('+password) porque password por padrao nao é retornado nas buscas
   const user = await User.findOne({ email }).select('+password');
 
   if(!user)
-    return res.status(400).json({ erro: 'User not found. '});
+    return res.status(400).json({ error: 'User not found. '});
   
   if(!await bcrypt.compare(password, user.password))
-    return res.status(400).json({ erro: 'Invalid password. '});
+    return res.status(400).json({ error: 'Invalid password.' });
   
   user.password = undefined;
 
-  res.json({ 
+  res.json({
     user,
-    token: generateToken({ id: user.id }),
+    token: generateToken({ id: user.id, role: user.role }),
   });
 });
 
 
-module.exports = app => app.use('/auth', router);
+module.exports = app => app.use('/', router);

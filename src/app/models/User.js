@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 
-const mongoose = require ('../database/connect');
+const mongoose = require ('../../database/connect');
+
+const ROLES = require('../../config/roles');
 
 
 const UserSchema = new mongoose.Schema({
@@ -18,6 +20,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false,
+  },
+  role: {
+    type: String,
+    enum: [ROLES.PATIENT, ROLES.EMPLOYEE, ROLES.ADMIN],
+    default: ROLES.PATIENT,
   },
   createdAt: {
     type: Date,

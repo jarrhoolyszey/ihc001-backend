@@ -7,6 +7,7 @@ app.use(express.json());
 
 // routes 
 require('./app/controllers/authController')(app);
+require('./app/controllers/userController')(app);
 
 app.get('/', (req, res) => {
   res.json({
