@@ -2,8 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const User = require('../models/User');
-
+const Especialista = require('../models/Especialista');
+const Paciente= require('../models/Paciente');
 
 const router = express.Router();
 
@@ -21,22 +21,26 @@ function generateToken(params = {}) {
  * Login route
  */
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, senha } = req.body;
 
-  // select('+password) porque password por padrao nao é retornado nas buscas
-  const user = await User.findOne({ email }).select('+password');
+  // select('+senha) porque senha por padrao nao é retornado nas buscas
+  // const user = await User.findOne({ email }).select('+senha');
+  const user = (
+    await Especialista.findOne({ email }).select('+senha +permissao') ||
+    await Paciente.findOne({ email }).select('+senha +permissao')
+  );
 
   if(!user)
-    return res.status(400).json({ error: 'User not found. '});
+    return res.status(400).json({ error: 'Usuario nao encontrado. '});
   
-  if(!await bcrypt.compare(password, user.password))
-    return res.status(400).json({ error: 'Invalid password.' });
+  if(!await bcrypt.compare(senha, user.senha))
+    return res.status(400).json({ error: 'Senha invalida.' });
   
-  user.password = undefined;
+  user.senha = undefined;
 
   res.json({
     user,
-    token: generateToken({ id: user.id, role: user.role }),
+    token: generateToken({ id: user.id, permissao: user.permissao }),
   });
 });
 

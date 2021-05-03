@@ -1,8 +1,10 @@
 
 class ROLES {
-  ADMIN = 'admin';
-  PATIENT = 'patient';
-  EMPLOYEE = 'employee';
+  constructor() {
+    this.ADMIN = 'admin';
+    this.PACIENTE = 'paciente';
+    this.ESPECIALISTA = 'especialista';
+  }
 }
 
 module.exports = new ROLES;

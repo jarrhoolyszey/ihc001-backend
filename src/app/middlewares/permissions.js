@@ -4,11 +4,11 @@
  */
 function hasRole() {
   return (req, res, next) => {
-    const { userRole } = req;
+    const { userPermissao } = req;
 
     if (arguments) {
       for(let i=0; i<arguments.length; i++) {
-        if( arguments[i] === userRole )
+        if( arguments[i] === userPermissao )
           return next();
       }
     }
