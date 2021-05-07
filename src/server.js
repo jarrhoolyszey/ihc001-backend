@@ -1,9 +1,18 @@
 const express = require('express');
+const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200,
+  methods: 'GET, POST, PUT, DELETE'
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
 
 // routes 
 // require('./app/controllers/index')(app);
