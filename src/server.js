@@ -6,7 +6,7 @@ const port = process.env.PORT || 8080;
 
 const whitelist = [
   'http://localhost:3000',
-  'https://ihc-frontend.herokuapp.com/'
+  'https://ihc-frontend.herokuapp.com'
 ]
 
 const corsOptions = {
