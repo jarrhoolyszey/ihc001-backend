@@ -4,7 +4,11 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 8080;
 
-const whitelist = ['http://localhost:3000']
+const whitelist = [
+  'http://localhost:3000',
+  'https://ihc-frontend.herokuapp.com/'
+]
+
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
