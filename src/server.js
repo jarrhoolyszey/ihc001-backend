@@ -4,8 +4,15 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 8080;
 
+const whitelist = ['http://localhost:3000']
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   optionsSuccessStatus: 200,
   methods: 'GET, POST, PUT, DELETE'
 };
@@ -29,5 +36,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Server started at http://localhost:${port}`);
+  console.log(`Server started at port ${port}`);
 });
