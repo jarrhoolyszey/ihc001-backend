@@ -13,6 +13,9 @@ const PacienteSchema = new mongoose.Schema({
   sobrenome: {
     type: String,
   },
+  sexo: {
+    type: String,
+  },
   email: {
     type: String,
     unique: true,
@@ -25,11 +28,11 @@ const PacienteSchema = new mongoose.Schema({
   },
   CPF: {
     type: String,
-    unique: false,
+    unique: true,
   },
   RG: {
     type: String,
-    unique: false,
+    unique: true,
   },
   data_nascimento: {
     type: Date,
@@ -39,6 +42,9 @@ const PacienteSchema = new mongoose.Schema({
   },
   endereco: {
     logradouro: {
+      type: String,
+    },
+    numero: {
       type: String,
     },
     complemento: {
@@ -61,6 +67,9 @@ const PacienteSchema = new mongoose.Schema({
     type: String,
     default: roles.PACIENTE,
     select: false,
+  },
+  categorias: {
+    type: Array,
   },
   created: {
     type: Date,

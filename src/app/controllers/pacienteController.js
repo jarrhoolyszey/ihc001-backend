@@ -21,10 +21,10 @@ router.use(hasRole(roles.ADMIN, roles.ESPECIALISTA));
  * Permissao: Admin, Especialista
  */
 router.post('/', async (req, res) => {
-  const { email } = req.body;
+  const { email, CPF } = req.body;
 
   try {
-    if (await Paciente.findOne({ email }))
+    if (await Paciente.findOne({ $or: [{email}, {CPF}] }))
       return res.status(409).json({ error: 'Paciente ja cadastrado.' });
     
     const paciente = await Paciente.create(req.body);
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
     res.json( paciente );
 
   } catch (e) {
-    return res.status(400).json({ error: e.message });
+    return res.json({ error: e.message });
   }
 });
 
@@ -93,6 +93,29 @@ router.get('/', async (req, res) => {
 
   } catch (e) {
     return res.status(400).json({ error: e.message });
+  }
+});
+
+/**
+ * Busca um Paciente especifico
+ * Permissoes: Admin, Especialista
+ */
+
+router.get('/buscar', async (req, res) => {
+  try {
+    const { email, CPF } = req.query;
+
+    await Paciente.find({ $or: [ { email }, { CPF } ] },
+      (err, paciente) => {
+        if( err ) {
+          return res.status(400).json({ error: 'Paciente não encontrado. '})
+        }
+
+        return res.json(paciente);
+    });
+
+  } catch (err) {
+    console.log(err);
   }
 });
 

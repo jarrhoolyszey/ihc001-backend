@@ -12,7 +12,10 @@ function generateToken(params = {}) {
   return jwt.sign(
     params,
     process.env.JWT_SECRET,
-    { expiresIn: 86400 } 
+    { 
+      expiresIn: 86400
+      //expiresIn: 1 
+    } 
   );
 }
 
@@ -31,10 +34,10 @@ router.post('/login', async (req, res) => {
   );
 
   if(!user)
-    return res.status(400).json({ error: 'Usuario nao encontrado. '});
+    return res.status(400).json({ error: 'Usuário não encontrado.' });
   
   if(!await bcrypt.compare(senha, user.senha))
-    return res.status(400).json({ error: 'Senha invalida.' });
+    return res.status(400).json({ error: 'Senha inválida.' });
   
   user.senha = undefined;
 
@@ -45,4 +48,35 @@ router.post('/login', async (req, res) => {
 });
 
 
-module.exports = app => app.use('/', router);
+/**
+ * Verify token 
+ */
+router.post('/verify-token', async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if(err) {
+        return res.status(400).json({
+          err,
+          decoded
+        });
+      }
+
+      const user = (
+        await Especialista.findOne({ _id: decoded.id }) ||
+        await Paciente.findOne({ _id: decoded.id })
+      )
+
+      if(!user)
+        return res.status(400).json({ error: 'Usuario nao encontrado.' })
+
+      return res.status(200).json({ user })
+    })
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+})
+
+
+module.exports = app => app.use('/auth', router);
