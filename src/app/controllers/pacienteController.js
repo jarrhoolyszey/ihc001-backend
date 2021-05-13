@@ -105,6 +105,8 @@ router.get('/buscar', async (req, res) => {
   try {
     const { email, CPF } = req.query;
 
+    console.log(`--Server: email: ${email}, CPF: ${CPF}`)
+
     await Paciente.find({ $or: [ { email }, { CPF } ] },
       (err, paciente) => {
         if( err ) {
