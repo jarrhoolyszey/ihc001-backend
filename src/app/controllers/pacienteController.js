@@ -27,12 +27,19 @@ router.post('/', async (req, res) => {
     if (await Paciente.findOne({ $or: [{email}, {CPF}] }))
       return res.status(409).json({ error: 'Paciente ja cadastrado.' });
     
-    const paciente = await Paciente.create(req.body);
-
-    res.json( paciente );
+    await Paciente.create(req.body, (err, paciente) => {
+      if (err) {
+        console.log(err);
+        return res.status(400).json({ error: err.message });
+      }
+      
+      console.log('--PacienteController: Paciente criado com sucesso!')
+       return res.status(200).json( paciente );
+    });
 
   } catch (e) {
-    return res.json({ error: e.message });
+    console.log(e);
+    return res.sendStatus(500);
   }
 });
 
