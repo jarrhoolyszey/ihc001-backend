@@ -1,5 +1,3 @@
-const bcrypt = require('bcryptjs');
-
 const mongoose = require('../../database/connect');
 const Schema = mongoose.Schema; 
 
@@ -13,8 +11,11 @@ const AtendimentoSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: 'Paciente',
   },
-  motivo: {
-    type: String,
+  sintomas: {
+    type: [String],
+  },
+  exames: {
+    type: Array,
   },
   prescricoes: {
     type: [String],

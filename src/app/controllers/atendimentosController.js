@@ -1,4 +1,5 @@
 const express = require('express');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const Atendimento = require('../models/Atendimento');
 
@@ -40,6 +41,27 @@ router.get('/', async (req, res) => {
     return res.status(400).json({ error: e.message });
   }
 });
+
+/**
+ * Lista todos atendimentos de um paciente
+ */
+router.get('/:id_paciente', async (req, res) => {
+  try {
+    const { id_paciente } = req.params;
+
+    const atendimentos = await Atendimento.find({pacienteId: id_paciente}).populate('especialistaId');
+    
+    if(!atendimentos) {
+      throw new Error('Atendimentos nao encontrados.');
+    }
+
+    return res.json(atendimentos);
+    
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(500);
+  }
+})
 
 
 module.exports = app => app.use('/atendimentos', router);
