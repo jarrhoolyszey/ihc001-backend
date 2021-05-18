@@ -23,8 +23,12 @@ const AtendimentoSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  updatedAt: {
+	type: Date,
   }
 });
+
 
 
 const Atendimento = mongoose.model('Atendimento', AtendimentoSchema);

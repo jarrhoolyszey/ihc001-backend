@@ -14,13 +14,24 @@ router.use(auth);
  * Cadastra um novo Atendimento
  */
 router.post('/', async (req, res) => {
-  const { especialistaId, pacienteId } = req.body;
+  const { _id, especialistaId, pacienteId } = req.body;
 
   try {
-    const atendimento = await Atendimento.create(req.body);
-
-    return res.json( atendimento );
-
+	let atendimento = await Atendimento.findOneAndUpdate({_id}, req.body);
+	
+	if(!atendimento) {
+		console.log('Falha na atualização do atendimento!');
+		
+		// Tenta criar um novo atendimento no BD
+		atendimento = await Atendimento.create(req.body);
+		if (!atendimento) {
+			console.log('Falha na criação do atendimento');
+			return res.status(400).send('Falha na criação do atendimento');
+		}
+	}
+	
+	return res.json(atendimento);	
+	
   } catch (e) {
     return res.status(400).json({ error: e.message });
   }
@@ -49,7 +60,9 @@ router.get('/:id_paciente', async (req, res) => {
   try {
     const { id_paciente } = req.params;
 
-    const atendimentos = await Atendimento.find({pacienteId: id_paciente}).populate('especialistaId');
+    const atendimentos = await Atendimento.find({pacienteId: id_paciente})
+								.populate('especialistaId')
+								.sort('-createdAt');
     
     if(!atendimentos) {
       throw new Error('Atendimentos nao encontrados.');
