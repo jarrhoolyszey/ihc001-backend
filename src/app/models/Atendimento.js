@@ -17,6 +17,9 @@ const AtendimentoSchema = new mongoose.Schema({
   exames: {
     type: Array,
   },
+  diagnostico: {
+	type: String,
+  },
   prescricoes: {
     type: [String],
   },
