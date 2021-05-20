@@ -2,6 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const auth = require('../middlewares/auth');
+
 const Especialista = require('../models/Especialista');
 const Paciente= require('../models/Paciente');
 
@@ -13,8 +15,7 @@ function generateToken(params = {}) {
     params,
     process.env.JWT_SECRET,
     { 
-      expiresIn: 86400
-      //expiresIn: 1 
+      expiresIn: 86400,
     } 
   );
 }
@@ -25,7 +26,7 @@ function generateToken(params = {}) {
  */
 router.post('/login', async (req, res) => {
   const { email, senha } = req.body;
-
+  
   // select('+senha) porque senha por padrao nao é retornado nas buscas
   // const user = await User.findOne({ email }).select('+senha');
   const user = (
@@ -33,15 +34,16 @@ router.post('/login', async (req, res) => {
     await Paciente.findOne({ email }).select('+senha +permissao')
   );
 
-  if(!user)
-    return res.status(400).json({ error: 'Usuário não encontrado.' });
-  
+  if(!user) {
+    return res.status(401).json({error: 'Ops! Usuário não foi encontrado.'});
+  }
+
   if(!await bcrypt.compare(senha, user.senha))
-    return res.status(400).json({ error: 'Senha inválida.' });
+    return res.status(401).json({ error: 'Ops! Senha inválida.' });
   
   user.senha = undefined;
 
-  res.json({
+  res.status(200).json({
     user,
     token: generateToken({ id: user.id, permissao: user.permissao }),
   });
@@ -51,13 +53,13 @@ router.post('/login', async (req, res) => {
 /**
  * Verify token 
  */
-router.post('/verify-token', async (req, res) => {
+router.post('/verify-token', auth, async (req, res) => {
   const { token } = req.body;
 
   try {
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
       if(err) {
-        return res.status(400).json({
+        return res.status(403).json({
           err,
           decoded
         });
@@ -74,9 +76,40 @@ router.post('/verify-token', async (req, res) => {
       return res.status(200).json({ user })
     })
   } catch (err) {
-    return res.status(400).json({err});
+    return res.status(400).json({error: err.message});
   }
 })
+
+
+/*
+ * Change Password
+ */
+router.post('/change-password/:id', auth, async (req, res) => {
+  try {
+    const { senha, novaSenha } = req.body;
+    const { id } = req.params;
+
+    const user = await Especialista.findById(id).select('+senha') ||
+                 await Paciente.findById(id).select('+senha');
+
+    if(!user) 
+      return res.status(400).json({ error: 'Ops! Usuário não encontrado.' });
+
+    if(!await bcrypt.compare(senha, user.senha))
+      return res.status(403).json({ error: 'Ops! Senha inválida.' });
+    
+    const hash = await bcrypt.hash(novaSenha, 10);
+
+    user.senha = hash
+    await user.save();
+      
+    return res.status(200).json({ user, msg: 'Senha alterada com sucesso!' });
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err.message });
+  }
+});
 
 
 module.exports = app => app.use('/auth', router);
