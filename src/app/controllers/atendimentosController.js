@@ -15,7 +15,8 @@ router.use(auth);
  */
 router.post('/', async (req, res) => {
   const { _id, especialistaId, pacienteId } = req.body;
-
+  console.log('id atendimento:', _id);
+  
   try {
 	let atendimento = await Atendimento.findOneAndUpdate({_id}, req.body);
 	
@@ -23,14 +24,15 @@ router.post('/', async (req, res) => {
 		console.log('Falha na atualização do atendimento!');
 		
 		// Tenta criar um novo atendimento no BD
-		atendimento = await Atendimento.create(req.body);
-		if (!atendimento) {
-			console.log('Falha na criação do atendimento');
-			return res.status(400).send('Falha na criação do atendimento');
-		}
+		atendimento = await Atendimento.create(req.body, (err, doc) => {
+		  if(err) {
+		    console.log(err.message);
+			return res.status(500).json({ error: err.message });
+		  }
+		});
 	}
 	
-	return res.json(atendimento);	
+	return res.status(200).json(atendimento);	
 	
   } catch (e) {
     return res.status(400).json({ error: e.message });

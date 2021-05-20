@@ -33,6 +33,13 @@ const AtendimentoSchema = new mongoose.Schema({
 });
 
 
+AtendimentoSchema.pre('save', function(next) {
+  console.log(`${this._id} was updated!`);
+  this.updatedAt = Date.now();
+  
+  return next();
+});
+
 
 const Atendimento = mongoose.model('Atendimento', AtendimentoSchema);
 

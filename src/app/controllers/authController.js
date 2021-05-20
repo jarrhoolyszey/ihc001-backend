@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const Especialista = require('../models/Especialista');
 const Paciente= require('../models/Paciente');
 
+const auth = require('../middlewares/auth');
+
 const router = express.Router();
 
 
@@ -41,7 +43,7 @@ router.post('/login', async (req, res) => {
   
   user.senha = undefined;
 
-  res.json({
+  res.status(200).json({
     user,
     token: generateToken({ id: user.id, permissao: user.permissao }),
   });
@@ -51,7 +53,7 @@ router.post('/login', async (req, res) => {
 /**
  * Verify token 
  */
-router.post('/verify-token', async (req, res) => {
+router.post('/verify-token', auth, async (req, res) => {
   const { token } = req.body;
 
   try {
@@ -75,6 +77,40 @@ router.post('/verify-token', async (req, res) => {
     })
   } catch (err) {
     return res.status(400).json({err});
+  }
+})
+
+/*
+ * Trocar senha do usuario
+ */
+router.post('/change-password', auth, async (req, res) => {
+  try {
+    const { id, password, newPassword } = req.body;
+
+    const user = (
+      await Especialista.findById(id).select('+senha') ||
+      await Paciente.findById(id).select('+senha')
+    );
+      
+    if(!user) {
+      return res.status(400).send('Usuario nao encontrado.');
+    }
+
+    if(!await bcrypt.compare(password, user.senha))
+      return res.status(403).send('Senha invalida.')
+    
+    const hashPass = bcrypt.hashSync(newPassword, 10);
+
+    await user.update({senha: hashPass}, (err, doc) => {
+      if(err) {
+        return res.status(400).send('Problema ao atualizar o registro do usuario.');    
+      }
+    })
+	
+	return res.status(200).json(user);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err.message);
   }
 })
 

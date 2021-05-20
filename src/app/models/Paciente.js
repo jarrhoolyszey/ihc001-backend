@@ -81,11 +81,9 @@ const PacienteSchema = new mongoose.Schema({
   },
 });
 
-PacienteSchema.pre('save', async function(next) {
+PacienteSchema.pre('save', function(next) {
   const hash = bcrypt.hashSync(this.senha, 10);
   this.senha = hash;
-
-  this.updated = Date.now();
 
   return next();
 });
