@@ -24,7 +24,7 @@ const corsOptions = {
 //app.use(cors(corsOptions));
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 
 // routes 
@@ -35,11 +35,6 @@ require('./app/controllers/especialistaController')(app);
 require('./app/controllers/pacienteController')(app);
 require('./app/controllers/atendimentosController')(app);
 
-app.get('/', (req, res) => {
-  res.json({
-    message: 'ok',
-  })
-})
 
 app.listen(port, () => {
   console.log(`Server started at port ${port}`);
