@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
 /**
  * Verify token 
  */
-router.post('/verify-token', auth, async (req, res) => {
+router.post('/verify-token', async (req, res) => {
   const { token } = req.body;
 
   try {
