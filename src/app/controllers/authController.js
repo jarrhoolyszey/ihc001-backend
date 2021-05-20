@@ -97,12 +97,11 @@ router.post('/change-password/:id', auth, async (req, res) => {
 
     if(!await bcrypt.compare(senha, user.senha))
       return res.status(403).json({ error: 'Ops! Senha inválida.' });
-    
-    const hash = await bcrypt.hash(novaSenha, 10);
 
-    user.senha = hash
+    user.senha = novaSenha;
     await user.save();
-      
+    
+    user.senha = undefined;
     return res.status(200).json({ user, msg: 'Senha alterada com sucesso!' });
 
   } catch (err) {
