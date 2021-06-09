@@ -31,6 +31,13 @@ const EspecialistaSchema = new mongoose.Schema({
     numero: {
       type: String,
     },
+	uf: {
+	  type: String,
+	  uppercase: true,
+	  maxlength: 2,
+	  minlength: 2,
+	  required: true,
+	},
     especialidade: {
       type: String,
     }

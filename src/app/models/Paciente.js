@@ -55,6 +55,9 @@ const PacienteSchema = new mongoose.Schema({
     },
     estado: {
       type: String,
+	  uppercase: true,
+	  maxlength: 2,
+	  minlength: 2,
     },
     cidade: {
       type: String,

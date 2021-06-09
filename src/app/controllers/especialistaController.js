@@ -25,10 +25,10 @@ router.post('/', async (req, res) => {
     if(await Especialista.findOne({ email }))
       return res.status(409).json({ error: 'Especialista ja cadastrado. '});
     
-    const especialista = await Especialista.create({
-      nome, email, senha
-    });
-
+    const especialista = await Especialista.create(req.body);
+	
+	especialista.senha = undefined;
+	
     return res.json( especialista );
 
   } catch (e) {

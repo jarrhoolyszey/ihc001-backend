@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken');
 const auth = require('../middlewares/auth');
 
 const Especialista = require('../models/Especialista');
-const Paciente= require('../models/Paciente');
+const Paciente = require('../models/Paciente');
+const Admin = require('../models/Admin');
 
 const router = express.Router();
 
@@ -31,7 +32,8 @@ router.post('/login', async (req, res) => {
   // const user = await User.findOne({ email }).select('+senha');
   const user = (
     await Especialista.findOne({ email }).select('+senha +permissao') ||
-    await Paciente.findOne({ email }).select('+senha +permissao')
+    await Paciente.findOne({ email }).select('+senha +permissao') ||
+	await Admin.findOne({ email }).select('+senha +permissao')
   );
 
   if(!user) {
